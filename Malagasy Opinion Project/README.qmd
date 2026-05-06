@@ -1,0 +1,11 @@
+---
+title: "README"
+author: "Corey White"
+format: html
+---
+
+# Project Intro
+
+This assignment was designed to have a student pick a piece of research, clean and manipulate the data, and produce a visual product based on basic findings of their choice. I used Afrobarometer's Madagascar  2024 data. I decided to look at how Malagasy feel about the executive and public service provision. Despite negative views on services, corruption, police reliability, etc. Malagasy still have a favorable view of the president. I looked for factors that may influence this, and discovered that most have favorable opinions on the state's improving ability to prevent or end violent conflicts. I suggest that stability is more important to Malagasy than accountability. 
+
+link to dataset: https://www.afrobarometer.org/data/data-sets/?select-countries%5B%5D=madagascar&hidden-current-page=1

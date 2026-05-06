@@ -1,0 +1,203 @@
+---
+title: "Malagasy Opinions on Public Services and Servants"
+subtitle: 'Corruption and Decline vs Violence Prevention'
+author: "Corey White"
+format: 
+  beamer:
+    theme: Singapore
+    colortheme: seahorse
+    aspectratio: 43
+knitr:
+  opts_chunk: 
+    echo: true
+    eval: true
+    prompt: false
+    tidy: false
+    comment: NA
+    message: false
+    warning: false
+    fig.align: 'center'
+    cache: false
+---
+
+#  \vspace*{\fill}
+\begin{center}
+How do Malagasy Feel about Public Officials' Provision of Services?
+\end{center}
+\vspace*{\fill}
+
+```{r echo = FALSE}
+library(knitr)
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+mytheme <- theme(
+      plot.background = element_rect(fill = "white", color = NA),
+      panel.grid.major.x = element_blank(),
+      axis.title = element_text(face = "bold", size = 10),
+      axis.text.x = element_text(angle = 35, hjust = 1),
+      plot.title = element_text(face = "bold", size = 12, color = "#213159"),
+      panel.border = element_blank(),
+      axis.line.x = element_line(color = "black")
+    )
+
+```
+
+```{r echo=FALSE}
+mad1 <- read_excel('mad1.xlsx', col_types = "text")
+
+df <-mad1
+df4 <- mad1 |>
+  select(Q48A, starts_with('Q47')) |>
+  mutate(across(everything(), ~ if_else(str_detect(., "Ne sait pas"), NA_character_, as.character(.)))) |>
+  filter(!is.na(Q48A)) |>
+  mutate(Q48A = fct_relevel(Q48A, 
+                            "Tout à fait d’accord", 
+                            "D’accord", 
+                            "En désaccord", 
+                            "Tout à fait en désaccord",
+                            "Refuse de répondre"))
+df5 <- df4 |>
+  filter(!is.na(Q47K))|>
+  filter(!is.na(Q47J)) |>
+  filter(!is.na(Q47M)) |>
+  filter(Q47J != "Refuse de répondre") |>
+  mutate(Q47K = fct_relevel(Q47K,
+                            'Très mal',
+                            'Plutôt mal',
+                            'Plutôt bien',
+                            'Très bien'
+                            )) |>
+  mutate(Q47J = fct_relevel(Q47J,
+                            'Très mal',
+                            'Plutôt mal',
+                            'Plutôt bien',
+                            'Très bien',
+                            'Refuse de répondre')) |>
+  mutate(Q47M = fct_relevel(Q47M,
+                            'Très mal',
+                            'Plutôt mal',
+                            'Plutôt bien',
+                            'Très bien'))
+```
+
+# Core Findings
+
+*Malagasy have an unfavorable opinion about the provision and maintenance of services on the island as well as public corruption, yet maintain a favorable view of the President and Assembly.*
+
+# Findings
+
+This dataset uses the Afrobarometer data on Madagascar. Key measurements include:
+
+\begin{center}
+Entretien des routes et ponts/Maintenance of roads and bridges
+
+
+
+Lutte contre la corruption au sein de l’administration publique/Combating corruption in public administration
+
+
+Prévention ou résolution des conflits violents/Prevention or resolution to violent conflicts
+
+
+Performance du Président/Performance of the President
+\end{center}
+
+# Data
+
+
+## Malagasy have an unfavorable view on the maintenance of roads and bridges
+```{r}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+#| fig-cap: 'Maintenance of roads and bridges'
+
+df5|>
+  ggplot(aes(x = Q47K, fill = Q47K)) +
+  geom_bar(na.rm = T)+
+labs(
+  x = 'Opinion',
+  y =' Number of Responses'
+) +
+  scale_fill_manual(
+    values = c("Très mal" = "firebrick",
+               "Plutôt mal" = "#E2725B",
+               "Plutôt bien" = "darkseagreen",
+               "Très bien" = "seagreen")
+  )+ mytheme +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, .01)))
+```
+
+
+
+# Malagasy have an unfavorable view on controlling public corruption
+```{r}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+#| fig-cap: 'Combating corruption in public administration'
+
+df5|>
+  ggplot(aes(x = Q47J, fill = Q47J)) +
+  geom_bar(na.rm = T)+
+  labs(
+    x = 'Opinion',
+    y =' Number of Responses'
+  ) +
+  scale_fill_manual(
+    values = c("Très mal" = "firebrick",
+               "Plutôt mal" = "#E2725B",
+               "Plutôt bien" = "darkseagreen",
+               "Très bien" = "seagreen")
+  )+ mytheme +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, .01)))
+```
+
+# Yet, Malagasy have a Favorable View of the President.
+```{r}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+
+df4 |> ggplot(aes(x =Q48A)) + geom_bar(na.rm = T, fill = 'salmon')+
+  labs( title = 'Performance of the President', x = 'Performance', y = 'number of responses' ) + mytheme + coord_flip()
+```
+
+
+# Why do Malagasy favor the President if they cannot provide services?
+
+
+We can determine this by looking at the violent conflict data
+```{r}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+#| fig-cap: 'Prevention or resolution to violent conflicts'
+df5|>
+  ggplot(aes(x = Q47M, fill = Q47M)) +
+  geom_bar(na.rm = T)+
+  labs(
+    x = 'Opinion',
+    y =' Number of Responses'
+  ) +
+  scale_fill_manual(
+    values = c("Très mal" = "firebrick",
+               "Plutôt mal" = "#E2725B",
+               "Plutôt bien" = "darkseagreen",
+               "Très bien" = "seagreen")
+  )+ mytheme +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, .01)))
+```
+# Conclusion
+
+We may be able to conclude about why Malagasy favor their administration despite corruption and the ill
+maintenance of public services. If the Malagasy government is successful at ending violent conflicts,
+citizens may be more likely to overlook their outright corruption and the decline of the economy
+and public services including roads and electricity. To many Malagasy, outright stability is more
+important than the provision of services by the government.
+
