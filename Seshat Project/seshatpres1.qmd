@@ -1,0 +1,235 @@
+---
+title: "Egypt Seshat Presentation"
+author: "Corey White"
+format: 
+  beamer:
+    theme: Berlin
+    colortheme: dolphin
+    aspectratio: 43
+knitr:
+  opts_chunk: 
+    echo: true
+    eval: true
+    prompt: false
+    tidy: false
+    comment: NA
+    message: false
+    warning: false
+    fig.align: 'center'
+    cache: true
+---
+
+# \vspace*{\fill}
+
+\begin{center}
+Plotting Rise and Decline in Egypt's Old Kingdom
+\end{center}
+\vspace*{\fill}
+
+# Predynastic to the the First Intermediate Period
+
+## What does systemic decline look like in ancient times?
+
+Ancient Egypt's Old Kingdom decline resulted in the rise of provincial governors, called *Nomarchs*, who dissected the kingdom. This data looks at Upper Egypt, the southern provinces farther from the capital in Memphis.
+
+# 
+
+### Over the course of the Old Kingdom, Upper Egypt's population steadily increased.
+
+```{r echo = FALSE}
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+library(haven)
+Seshat <- read_excel('seshat.xlsx')
+egypt <- Seshat |>
+  filter(NGA == 'Upper Egypt')
+egtest <- egypt |>
+  filter(NGA == 'Upper Egypt', Polity == 'EgDyn1*' | Polity =='EgDyn2*' | Polity == 'EgOldK1' | Polity == 'EgOldK2' | Polity == 'EgRegns' | Polity == 'EgNaqa3') 
+egtest2 <- egtest |>
+  filter(Variable == 'Polity territory' | Variable == 'Polity Population' |Variable == 'Largest communication distance' | Variable == 'Fastest individual communication' | Variable == 'Population of the largest settlement' )
+
+egdata <- egtest2 |>
+  group_by(Polity, Variable)
+
+
+mytheme <- theme(
+  plot.background = element_rect(fill = '#F9F7F2', color = NA),
+  panel.grid.major.y = element_line(colour = 'grey50', linetype = 'dotted'),
+  panel.grid.major.x = element_blank(),
+  axis.text = element_text(family = 'serif', color = '#4A4A4A'),
+  plot.title = element_text(family = 'serif', face = 'bold', size = 16, color = '#2B4F60'),
+  panel.border = element_rect(fill = NA, colour = 'black'),
+  legend.position = 'none',
+  panel.background = element_rect(fill = 'grey99')
+)
+```
+```{r echo= FALSE}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+popplot <- egdata |>
+  mutate(Polity2 = factor(Polity, levels = c('EgNaqa3', 'EgDyn1*', 'EgDyn2*', 'EgOldK1', 'EgOldK2', 'EgRegns'))) |>
+  filter(Variable == 'Polity Population') |>
+  mutate(`Value From` = as.numeric(`Value From`)) |>
+  ggplot(aes(x = Polity2, y = `Value From`, fill = Polity)) +
+  geom_col(color = NA, size = .6) +
+  labs(
+    x = '(a) Total Polity Population',
+    y = 'Maximum Population'
+  ) +
+  scale_fill_manual(
+    values = c('#556B2F','#556B2F','#556B2F','#556B2F','#556B2F','#556B2F')
+  )+
+  scale_x_discrete(
+    labels = c(
+      'EgNaqa3' = 'Predynastic Period',
+      'EgDyn1*' = 'Dynasty I',
+      'EgDyn2*' = 'Dynasty II',
+      'EgOldK1' = 'Early 
+        Old Kingdom',
+      'EgOldK2' = 'Late 
+        Old Kingdom',
+      'EgRegns' = 'First
+      Intermediate
+      Period'
+    )
+  ) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, .01))) + mytheme
+
+(popplot)
+
+```
+
+# 
+
+## Centralization
+
+The Old Kingdom centralized Egypt, and built Egypt's first true cities. Settlement population expanded.
+Measurements form the First Intermediate period, however, show a decline in maximum settlement population
+
+#
+
+```{r echo = FALSE}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+setpopplota <- egdata |>
+  mutate(Polity2 = factor(Polity, levels = c('EgNaqa3', 'EgDyn1*', 'EgDyn2*', 'EgOldK1', 'EgOldK2', 'EgRegns'))) |>
+  filter(Variable == 'Population of the largest settlement') |>
+  mutate(`Value From` = as.numeric(`Value From`)) |>
+  group_by(Polity2) |>
+  summarise(frommax = max(`Value From`, na.rm = TRUE)) 
+
+setpopplot <- 
+  ggplot(setpopplota, aes(x = Polity2,  y = frommax, fill = Polity2)) +
+  geom_col(color = NA, size = .6) +
+  scale_y_continuous(
+    labels = scales::label_comma(), 
+    expand = expansion(mult = c(0, .01)))+
+  labs(
+    x = ' (b) Settlement Population',
+    y = 'Population of the Largest Settlement'
+  ) +
+  scale_x_discrete(
+    labels = c(
+      'EgNaqa3' = 'Predynastic Period',
+      'EgDyn1*' = 'Dynasty I',
+      'EgDyn2*' = 'Dynasty II',
+      'EgOldK1' = 'Early 
+        Old Kingdom',
+      'EgOldK2' = 'Late 
+        Old Kingdom',
+      'EgRegns' = 'First Intermediate
+    Period'
+    )
+  ) +
+  scale_fill_manual(
+    values = c('#556B2F','#556B2F','#556B2F','#556B2F','#556B2F','#556B2F')
+  )+ mytheme
+(setpopplot)
+
+```
+
+#
+ 
+## Territorial Extent
+Lastly, we can see that the maximum extent of Egypt's polities decreased over time, indicating a breakdown of 
+central authority.
+
+# 
+```{r echo = FALSE}
+#| echo: false 
+#| fig.height: 3
+#| fig.width: 5.5 
+
+terrplota <- egdata |>
+  mutate(Polity2 = factor(Polity, levels = c('EgNaqa3', 'EgDyn1*', 'EgDyn2*', 'EgOldK1', 'EgOldK2', 'EgRegns'))) |>
+  filter(Variable == 'Polity territory') |>
+  mutate(`Value From` = as.numeric(`Value From`)) |>
+  group_by(Polity2) |>
+  summarise(frommax = max(`Value From`, na.rm = TRUE)) 
+
+terrplot <- 
+  ggplot(terrplota, aes(x = Polity2,  y = frommax, fill = Polity2)) +
+  geom_col(color = NA, size = .6) +
+  scale_y_continuous(
+    labels = scales::label_comma(), 
+    expand = expansion(mult = c(0, .01)))+
+  labs(
+    x = '(c) Territorial Extent of Polities',
+    y = 'Maximum Territory, in KM2'
+  ) +
+  scale_x_discrete(
+    labels = c(
+      'EgNaqa3' = 'Predynastic Period',
+      'EgDyn1*' = 'Dynasty I',
+      'EgDyn2*' = 'Dynasty II',
+      'EgOldK1' = 'Early 
+        Old Kingdom',
+      'EgOldK2' = 'Late 
+        Old Kingdom',
+      'EgRegns' = 'First Intermediate
+    Period'
+    )
+  ) +
+  scale_fill_manual(
+    values = c('#556B2F','#556B2F','#556B2F','#556B2F','#556B2F','#556B2F')
+  )+ mytheme
+terrplot
+
+```
+
+# 
+
+## Synthesized Output
+
+#
+
+```{r echo = FALSE}
+#| echo: false 
+#| fig.height: 6
+#| fig.width: 12
+
+egcombine <- popplot + setpopplot + terrplot +
+  plot_annotation(
+    title = 'Population and Territory in Ancient Egypt', 
+    subtitle = 'From Predynastic Egypt to the First Intermediate Period (3,300-2,055 BCE)',
+    theme = theme(
+      plot.title = element_text(size = 18, face = 'bold', hjust =.0),
+      plot.subtitle = element_text(face = 'italic', hjust = .1)
+    )
+    
+  )
+(egcombine)
+```
+
+#
+
+## Analysis
+We can see that increased rurification combined with increased total population
+signals a breakdown in central authority and command in Upper Egypt. Please consult the `README`
+for a complete breakdown and analysis.
